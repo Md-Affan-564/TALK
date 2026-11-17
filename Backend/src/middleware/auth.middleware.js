@@ -1,43 +1,66 @@
-const jwt = require('jsonwebtoken')
-const userModel = require('../modules/auth/user.model')
+const jwt = require("jsonwebtoken");
+const userModel = require("../models/user.model");
 
+async function protectRoute(req, res, next) {
+  try {
+    // FLAG 1: Check cookie
+    let token = req.cookies.token;
 
-async function protectRoute (req,res,next){
-    try{let token = req.cookies.token
-    if(!token){
-        return res.status(401).json({
-            message:"Please sign in or sign up. this is 401"
-        })
+    if (!token) {
+      return res.status(401).json({
+        flag: "AUTH_01_NO_COOKIE",
+        message: "Token cookie is missing",
+      });
     }
-    let info = jwt.verify(token,process.env.JWT_SECRET)
-    if(info){
-        let user = await userModel.findOne({_id:info.userId})
-        if (user){
-            req.user = {username:user.username,email:user.email}
-            next()
-        }else{
-            return res.status(401).json({
-                message:"Please sign in or sign up it is also 401"
-            })
-        }
-    }else{
-        return res.status(401).json({
-            message:"Please sign in or sign up this is 401"
-        })
-    }}catch(err){
-        if (
-            err.name === "JsonWebTokenError" ||
-            err.name === "TokenExpiredError"
-        ) {
-            return res.status(401).json({
-                message: "Please sign in. also 401"
-            })
-        }else{
-            return res.status(500).json({
-                message:err.message
-            })
-        }
+
+    // FLAG 2: Verify JWT
+    let info = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!info) {
+      return res.status(401).json({
+        flag: "AUTH_02_INVALID_PAYLOAD",
+        message: "JWT payload is missing",
+      });
     }
+    console.log(info);
+    // FLAG 3: Find user in database
+    let user = await userModel.findById(info.user);
+
+    if (!user) {
+      return res.status(401).json({
+        flag: "AUTH_03_USER_NOT_FOUND",
+        message: "Token is valid but user does not exist",
+      });
+    }
+
+    // FLAG 4: Authentication successful
+    req.user = {
+      _id: info.user,
+      username: user.username,
+      email: user.email,
+    };
+
+    return next();
+  } catch (err) {
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        flag: "AUTH_05_INVALID_TOKEN",
+        message: "JWT signature or format is invalid",
+      });
+    }
+
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({
+        flag: "AUTH_06_TOKEN_EXPIRED",
+        message: "JWT has expired",
+      });
+    }
+
+    return res.status(500).json({
+      flag: "AUTH_07_SERVER_ERROR",
+      message: err.message,
+    });
+  }
 }
 
-module.exports = protectRoute
+module.exports = protectRoute;
