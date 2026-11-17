@@ -11,7 +11,6 @@ app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://talk-x-guftguu.vercel.app"],
-
     credentials: true,
   })
 );
