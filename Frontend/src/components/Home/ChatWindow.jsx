@@ -3,6 +3,7 @@ import Message from "./Message";
 import apiRequest from "../../services/api";
 const ChatWindow = ({
   currentContact,
+  setCurrentContact,
   messages,
   setMessages,
   user,
@@ -39,7 +40,17 @@ const ChatWindow = ({
   }
   return (
     <div className="h-full w-full rounded-xl bg-background text-white overflow-hidden border border-border shadow-lg">
-      <div className="top-0 w-full bg-panel shrink-0 h-1/9 p-4 border-b border-border">
+      <div className="flex items-center gap-3 w-full bg-panel h-1/9 p-4 border-b border-border">
+        <button
+          onClick={() => setCurrentContact(null)}
+          aria-label="Back to contacts"
+          className="md:hidden group shrink-0 h-10 w-10 flex items-center justify-center rounded-xl border border-border bg-white/5 text-slate-300 transition-all duration-200 hover:bg-blue-500 hover:border-blue-400 hover:text-white active:scale-90 active:bg-blue-600"
+        >
+          <span className="text-xl transition-transform duration-200 group-hover:-translate-x-1">
+            ←
+          </span>
+        </button>
+
         {currentContact.username}
       </div>
 

@@ -105,8 +105,12 @@ const Home = ({ user, setUser }) => {
   }, [currentContact]);
 
   return (
-    <div className="flex h-screen w-screen gap-4 bg-[#090E1A] p-4 text-[#F1F5F9] overflow-hidden">
-      <div className="w-1/4 min-w-[280px] max-w-[360px]">
+    <div className="flex h-dvh w-screen md:gap-4 bg-[#090E1A] md:p-4 text-[#F1F5F9] overflow-hidden">
+      <div
+        className={`${
+          currentContact ? "hidden" : "flex"
+        } w-full md:flex md:w-1/4 md:min-w-[280px] md:max-w-[360px]`}
+      >
         <Sidebar
           email={email}
           setEmail={setEmail}
@@ -121,13 +125,18 @@ const Home = ({ user, setUser }) => {
         />
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div
+        className={`${
+          currentContact ? "flex" : "hidden"
+        } w-full min-w-0 md:flex md:flex-1`}
+      >
         <ChatWindow
           user={user}
           setError={setError}
           setMessages={setMessages}
           messages={messages}
           currentContact={currentContact}
+          setCurrentContact={setCurrentContact}
         />
       </div>
     </div>
