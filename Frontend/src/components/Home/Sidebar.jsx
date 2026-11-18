@@ -15,7 +15,10 @@ const Sidebar = ({
   user,
   setUser,
 }) => {
+  // Navigation
   const navigate = useNavigate();
+
+  // Handlers
   async function handleRemoveContact(contactId) {
     try {
       setError("");
@@ -40,14 +43,19 @@ const Sidebar = ({
       setError("Could not remove contact");
     }
   }
+
   async function handleLogout() {
     try {
       setError("");
+
       const response = await apiRequest("POST", {}, "/api/auth/logout");
+
       console.log("Logout response:", response);
+
       if (!response.data.success) {
         return setError(response.data.message);
       }
+
       setUser(null);
       navigate("/login", { replace: true });
     } catch (err) {
@@ -56,30 +64,43 @@ const Sidebar = ({
     }
   }
 
+  // UI
   return (
-    <div className="h-full w-full p-4 rounded-xl bg-[#111827] border border-[#263248] text-[#F1F5F9] flex flex-col">
-      <div className="flex justify-around items-center mb-5">
-        <h1 className="text-2xl font-bold text-accent">Talk</h1>
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-none border-0 bg-panel p-4 text-white sm:rounded-xl sm:border sm:border-border sm:p-5">
+      {/* Header */}
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Talk
+        </h1>
+
         <button
-          className="bg-accent px-3 py-1.5 rounded-md "
           onClick={() => {
             handleLogout();
           }}
+          className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-muted transition-all duration-200 hover:border-danger/50 hover:bg-danger/10 hover:text-danger active:scale-95"
         >
           Logout
         </button>
       </div>
-      <div className="mb-6">
-        <p className="text-sm text-[#94A3B8]">Welcome back,</p>
-        <h2 className="text-xl font-semibold text-[#F1F5F9] truncate">
-          {user.username}
-        </h2>
-      </div>
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">
-        Chats
-      </h2>
 
-      <div className="flex flex-col gap-2 overflow-y-auto flex-1">
+      {/* User Info */}
+      <div className="mb-7 min-w-0">
+        <p className="mb-1 text-sm text-muted">Welcome back,</p>
+
+        <h2 className="truncate text-xl font-semibold">{user.username}</h2>
+      </div>
+
+      {/* Contacts Heading */}
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+          Chats
+        </h2>
+
+        <span className="text-xs text-muted">{contacts.length}</span>
+      </div>
+
+      {/* Contact List */}
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain pr-1">
         {contacts.map((contact) => {
           return (
             <div
@@ -88,34 +109,48 @@ const Sidebar = ({
                 setCurrentContact(contact);
                 navigate("/");
               }}
-              className="p-3 rounded-lg bg-[#1E293B] hover:bg-[#263248] cursor-pointer transition"
+              className={`group min-w-0 cursor-pointer rounded-xl border p-3 transition-all duration-200 active:scale-[0.99] ${
+                currentContact?._id === contact._id
+                  ? "border-foreground/50 bg-foreground/10"
+                  : "border-transparent bg-surface hover:border-border hover:bg-[#222222]"
+              }`}
             >
-              <h3 className="font-medium text-sm">{contact.username}</h3>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveContact(contact.contactId);
-                }}
-                className="text-xs text-red-400 hover:text-red-300"
-              >
-                Remove
-              </button>
-              <div className="flex justify-between items-center mt-1">
-                <p className="text-xs text-[#94A3B8] truncate">Last message</p>
-                <p className="text-xs text-[#64748B]">10:30</p>
+              <div className="flex min-w-0 items-center justify-between gap-2">
+                <h3 className="truncate text-sm font-semibold">
+                  {contact.username}
+                </h3>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveContact(contact.contactId);
+                  }}
+                  className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs text-danger transition-colors hover:bg-danger/10 active:scale-95"
+                >
+                  Remove
+                </button>
+              </div>
+
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <p className="truncate text-xs text-muted">Last message</p>
+
+                <p className="shrink-0 text-xs text-muted/70">10:30</p>
               </div>
             </div>
           );
         })}
       </div>
 
-      <AddForm
-        email={email}
-        error={error}
-        setError={setError}
-        setEmail={setEmail}
-        getContacts={getContacts}
-      />
+      {/* Add Contact */}
+      <div className="mt-4 shrink-0">
+        <AddForm
+          email={email}
+          error={error}
+          setError={setError}
+          setEmail={setEmail}
+          getContacts={getContacts}
+        />
+      </div>
     </div>
   );
 };

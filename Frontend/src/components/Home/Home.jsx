@@ -6,6 +6,7 @@ import apiRequest from "../../services/api";
 import socket from "../../services/socket";
 
 const Home = ({ user, setUser }) => {
+  // State
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [contacts, setContacts] = useState([]);
@@ -13,10 +14,12 @@ const Home = ({ user, setUser }) => {
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
 
+  // Functions
   async function fetchMessages() {
     try {
       setMessages([]);
       setConversationId(null);
+
       const response = await fetchData(
         "GET",
         null,
@@ -27,6 +30,7 @@ const Home = ({ user, setUser }) => {
         console.log("this one ran");
         return;
       }
+
       setConversationId(response.data.conversationId);
       return setMessages(response.data.data);
     } catch (err) {
@@ -53,6 +57,8 @@ const Home = ({ user, setUser }) => {
       setError("something went wrong");
     }
   }
+
+  // Effects
   useEffect(() => {
     function handleNewMsg(msg) {
       setMessages((prev) => [...prev, msg]);
@@ -64,8 +70,10 @@ const Home = ({ user, setUser }) => {
       socket.off("new-message", handleNewMsg);
     };
   }, []);
+
   useEffect(() => {
     if (!conversationId) return;
+
     console.log(conversationId);
 
     socket.emit("join-conversation", conversationId);
@@ -74,6 +82,7 @@ const Home = ({ user, setUser }) => {
       socket.emit("leave-conversation", conversationId);
     };
   }, [conversationId]);
+
   useEffect(() => {
     getContacts();
   }, []);
@@ -104,8 +113,10 @@ const Home = ({ user, setUser }) => {
     fetchMessages();
   }, [currentContact]);
 
+  // UI
   return (
-    <div className="flex h-dvh w-screen md:gap-4 bg-[#090E1A] md:p-4 text-[#F1F5F9] overflow-hidden">
+    <div className="flex h-dvh w-full overflow-hidden bg-background text-white md:gap-4 md:p-4">
+      {/* Sidebar */}
       <div
         className={`${
           currentContact ? "hidden" : "flex"
@@ -125,6 +136,7 @@ const Home = ({ user, setUser }) => {
         />
       </div>
 
+      {/* Chat Window */}
       <div
         className={`${
           currentContact ? "flex" : "hidden"

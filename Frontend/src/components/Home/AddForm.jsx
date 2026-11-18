@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import apiRequest from "../../services/api";
+
 const AddForm = ({ email, setEmail, error, setError, getContacts }) => {
   async function submitHandler(e) {
     e.preventDefault();
@@ -16,11 +17,12 @@ const AddForm = ({ email, setEmail, error, setError, getContacts }) => {
       setError("something went wrong");
     }
   }
+
   return (
     <>
-      <form onSubmit={submitHandler} className="flex gap-2 w-full">
+      <form onSubmit={submitHandler} className="flex w-full gap-2">
         <input
-          className="flex-1 min-w-0 bg-[#1E293B] text-[#F1F5F9] placeholder-[#64748B] rounded-lg outline-none border border-[#334155] px-3 py-2 text-sm focus:border-[#38BDF8] transition"
+          className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-3 text-sm text-white outline-none transition placeholder:text-muted focus:border-foreground focus:ring-2 focus:ring-foreground/20"
           type="email"
           placeholder="Enter email..."
           value={email}
@@ -31,12 +33,13 @@ const AddForm = ({ email, setEmail, error, setError, getContacts }) => {
         />
 
         <input
-          className="cursor-pointer rounded-lg bg-[#0284C7] hover:bg-[#0EA5E9] text-white font-medium px-4 py-2 text-sm transition"
+          className="shrink-0 cursor-pointer rounded-xl bg-foreground px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-accent active:scale-95"
           type="submit"
           value="Add"
         />
       </form>
-      {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+
+      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
     </>
   );
 };

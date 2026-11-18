@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Message from "./Message";
 import apiRequest from "../../services/api";
+
 const ChatWindow = ({
   currentContact,
   setCurrentContact,
@@ -9,23 +10,28 @@ const ChatWindow = ({
   user,
   setError,
 }) => {
+  // State
   const [input, setInput] = useState("");
   const [inProgress, setInProgress] = useState(false);
 
+  // Handlers
   async function startConversation() {
     try {
       setInProgress(true);
+
       const conversation = await apiRequest(
         "POST",
         { text: input, receiverId: currentContact._id },
         "/api/message"
       );
+
       if (!conversation.data.success) {
         setError(conversation.data.messagae);
         setInProgress(false);
 
         return;
       }
+
       setInput("");
     } catch (err) {
       console.log(err.message);
@@ -35,39 +41,57 @@ const ChatWindow = ({
     }
   }
 
+  // UI
   if (!currentContact) {
-    return <div>Select a contact to start the chat</div>;
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-xl border border-border bg-background p-4 text-center text-muted">
+        Select a contact to start the chat
+      </div>
+    );
   }
+
   return (
-    <div className="h-full w-full rounded-xl bg-background text-white overflow-hidden border border-border shadow-lg">
-      <div className="flex items-center gap-3 w-full bg-panel h-1/9 p-4 border-b border-border">
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-none border-0 bg-background text-white shadow-lg sm:rounded-xl sm:border sm:border-border">
+      {/* Chat Header */}
+      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-panel px-4 sm:px-5">
         <button
           onClick={() => setCurrentContact(null)}
           aria-label="Back to contacts"
-          className="md:hidden group shrink-0 h-10 w-10 flex items-center justify-center rounded-xl border border-border bg-white/5 text-slate-300 transition-all duration-200 hover:bg-blue-500 hover:border-blue-400 hover:text-white active:scale-90 active:bg-blue-600"
+          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-muted transition-all duration-200 hover:border-foreground hover:bg-foreground hover:text-white active:scale-90 md:hidden"
         >
           <span className="text-xl transition-transform duration-200 group-hover:-translate-x-1">
             ←
           </span>
         </button>
 
-        {currentContact.username}
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-base font-semibold sm:text-lg">
+            {currentContact.username}
+          </h2>
+          <p className="text-xs text-muted">Conversation</p>
+        </div>
       </div>
 
-      <div className="bg-background h-7/9 p-4 overflow-y-auto flex flex-col gap-3">
-        {messages.length === 0
-          ? "No messages yet"
-          : messages.map((msg) => {
-              return (
-                <div key={msg._id}>
-                  <Message key={msg._id} message={msg} user={user} />
-                </div>
-              );
-            })}
+      {/* Messages */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain bg-background p-3 sm:p-5">
+        {messages.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center text-center text-sm text-muted">
+            No messages yet
+          </div>
+        ) : (
+          messages.map((msg) => {
+            return (
+              <div key={msg._id}>
+                <Message key={msg._id} message={msg} user={user} />
+              </div>
+            );
+          })
+        )}
       </div>
 
-      <div className="top-full w-full h-1/9 shrink-0 bg-panel p-4 border-t border-border">
-        <div className="flex items-center gap-3 w-full h-full px-4">
+      {/* Message Input */}
+      <div className="shrink-0 border-t border-border bg-panel p-3 sm:p-4">
+        <div className="flex w-full items-center gap-2 sm:gap-3">
           <input
             type="text"
             value={input}
@@ -83,8 +107,9 @@ const ChatWindow = ({
               startConversation();
             }}
             placeholder="Type a message..."
-            className="flex-1 min-w-0 bg-surface text-text placeholder-muted border border-border rounded-xl px-4 py-3 text-sm outline-none"
+            className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-muted focus:border-foreground focus:ring-2 focus:ring-foreground/20"
           />
+
           <button
             type="button"
             onClick={() => {
@@ -93,7 +118,7 @@ const ChatWindow = ({
               startConversation();
             }}
             disabled={inProgress}
-            className="bg-primary text-white px-5 py-3 bg-accent rounded-xl font-medium"
+            className="shrink-0 rounded-xl bg-foreground px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-accent active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
           >
             Send
           </button>
