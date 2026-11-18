@@ -3,15 +3,14 @@ const userModel = require("../../models/user.model");
 const jwt = require("jsonwebtoken");
 const cookieOptions = {
   httpOnly: true,
-  secure: true,
-  sameSite: "none",
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
 };
 async function logout(req, res) {
-  res.clearCookie("token", {
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
+  res.clearCookie("token", cookieOptions);
   res.status(200).json({
+    success: true,
+    statusCode: 200,
     message: "logged out successfully",
   });
 }
@@ -36,10 +35,14 @@ async function register(req, res) {
     console.log(err);
     if (err.code === 11000) {
       return res.status(409).json({
+        success: true,
+        statusCode: 409,
         message: "user already exists",
       });
     }
     return res.status(500).json({
+      success: true,
+      statusCode: 500,
       message: "something went wrong",
     });
   }
@@ -49,6 +52,7 @@ function getMe(req, res) {
   res.status(200).json({
     user: req.user,
     success: true,
+    statusCode: 200,
   });
 }
 

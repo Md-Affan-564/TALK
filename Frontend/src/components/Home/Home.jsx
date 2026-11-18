@@ -5,7 +5,7 @@ import fetchData from "../../services/api";
 import apiRequest from "../../services/api";
 import socket from "../../services/socket";
 
-const Home = ({ user }) => {
+const Home = ({ user, setUser }) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [contacts, setContacts] = useState([]);
@@ -117,6 +117,7 @@ const Home = ({ user }) => {
           currentContact={currentContact}
           setCurrentContact={setCurrentContact}
           user={user}
+          setUser={setUser}
         />
       </div>
 

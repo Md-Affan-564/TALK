@@ -1,6 +1,35 @@
 const userModel = require("../../models/user.model");
 const contactModel = require("../../models/contact.model");
+async function removeContact(userId, contactId) {
+  try {
+    const contact = await contactModel.findOneAndDelete({
+      _id: contactId,
+      $or: [{ owner: userId }, { receiver: userId }],
+    });
 
+    if (!contact) {
+      return {
+        success: false,
+        statusCode: 404,
+        message: "contact not found",
+      };
+    }
+
+    return {
+      success: true,
+      statusCode: 200,
+      message: "contact removed successfully",
+    };
+  } catch (error) {
+    console.log("removeContact error:", error.message);
+
+    return {
+      success: false,
+      statusCode: 500,
+      message: "internal server error",
+    };
+  }
+}
 const addContact = async (userId, email) => {
   try {
     const receiver = await userModel.findOne({ email });
@@ -72,4 +101,4 @@ const getContacts = async (userId) => {
   }
 };
 
-module.exports = { addContact, getContacts };
+module.exports = { addContact, getContacts, removeContact };

@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon src/server"
+    "dev": "nodemon src/server",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "type": "commonjs",
